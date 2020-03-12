@@ -152,6 +152,18 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\cubemap.fs" />
+    <None Include="assets\shaders\cubemap.vs" />
+    <None Include="assets\shaders\pixelation.fs" />
+    <None Include="assets\shaders\pixelation.vs" />
+    <None Include="assets\shaders\post\bloom.fs" />
+    <None Include="assets\shaders\post\bloom.vs" />
+    <None Include="assets\shaders\post\screenwave.fs" />
+    <None Include="assets\shaders\post\screenwave.vs" />
+    <None Include="assets\shaders\reflect.fs" />
+    <None Include="assets\shaders\reflect.vs" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

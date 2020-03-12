@@ -11,6 +11,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Fbo.h"
+#include "stb_image.h"
 
 #pragma comment(lib, "glew32.lib")
 
@@ -41,12 +42,120 @@ void onDebug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei len
 	std::cout << message << std::endl;
 }
 
+
+
+
+unsigned int loadCubemap(std::vector<std::string> faces)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+float skyboxVertices[] = {
+	// positions          
+	-1.0f,  1.0f, -1.0f,
+	-1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f, -1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+
+	-1.0f, -1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f,
+	-1.0f, -1.0f,  1.0f,
+
+	-1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f, -1.0f,
+	 1.0f,  1.0f,  1.0f,
+	 1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f,  1.0f,
+	-1.0f,  1.0f, -1.0f,
+
+	-1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f, -1.0f,
+	 1.0f, -1.0f, -1.0f,
+	-1.0f, -1.0f,  1.0f,
+	 1.0f, -1.0f,  1.0f
+};
+
+
+
+unsigned int cubemapTexture;
+
+Shader* cubemapShader;
+unsigned int skyboxVAO, skyboxVBO;
+
 void init()
 {
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glClearColor(1, 0.7f, 0.3f, 1.0f);
+
+
+	std::vector<std::string> faces;
+	{
+			"assets/textures/lnegx.png",
+			"assets/textures/lnegy.png",
+			"assets/textures/lnegz.png",
+			"assets/textures/lposx.png",
+			"assets/textures/lposy.png",
+			"assets/textures/lposz.png"
+			; };
+	cubemapTexture = loadCubemap(faces);
+	cubemapShader = new Shader("assets/shaders/cubemap");
+	// skybox VAO
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	room = new ObjModel("assets/models/room/room.obj");
 	roomShader = new Shader("assets/shaders/texture");
@@ -59,8 +168,11 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/texture"));
 	shaders.push_back(new Shader("assets/shaders/vertexanim"));
 	shaders.push_back(new Shader("assets/shaders/toon"));
+	shaders.push_back(new Shader("assets/shaders/pixelation"));
 
-	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
 
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
@@ -71,7 +183,6 @@ void init()
 	distances.push_back(2);
 	models.push_back(new ObjModel("assets/models/normalstuff/normaltest2.obj"));
 	distances.push_back(2);
-
 
 	if (glDebugMessageCallback)
 	{
@@ -87,13 +198,19 @@ void init()
 
 }
 
+
+
+
+float time = 0;
+
 void display()
 {
-
 	fbo->bind();
 	glViewport(0, 0, fbo->width, fbo->height);
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 
 	glm::mat4 projection = glm::perspective(glm::radians(70.0f), screenSize.x / (float)screenSize.y, 0.01f, 2000.0f);
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, distances[activeModel]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -101,14 +218,8 @@ void display()
 	model = glm::rotate(model, rotation, glm::vec3(0, 1, 0));
 
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
-
-	roomShader->use();
-	roomShader->setUniform("modelMatrix", glm::scale(glm::mat4(1), distances[activeModel] * glm::vec3(1, 1, 1)));
-	roomShader->setUniform("viewMatrix", view);
-	roomShader->setUniform("projectionMatrix", projection);
-	roomShader->setUniform("s_texture", 0);
-
-	room->draw();
+	
+	
 
 
 
@@ -124,6 +235,16 @@ void display()
 
 	models[activeModel]->draw();
 
+
+	cubemapShader->use();
+	view = glm::lookAt(glm::vec3(0, 0, distances[activeModel]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+
 	fbo->unbind();
 	glViewport(0, 0, screenSize.x, screenSize.y);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -137,7 +258,7 @@ void display()
 
 	postProcessShaders[0]->use();
 	postProcessShaders[0]->setUniform("s_texture", 0);
-
+	postProcessShaders[0]->setUniform("time", time);
 	fbo->use();
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * 4, &verts[0]);
@@ -147,7 +268,7 @@ void display()
 
 
 
-
+	time += 0.001;
 
 	glutSwapBuffers();
 }

@@ -45,4 +45,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\reflect.vs" />
+    <None Include="assets\shaders\reflect.fs" />
+    <None Include="assets\shaders\cubemap.fs" />
+    <None Include="assets\shaders\cubemap.vs" />
+    <None Include="assets\shaders\post\bloom.vs" />
+    <None Include="assets\shaders\post\bloom.fs" />
+    <None Include="assets\shaders\pixelation.vs" />
+    <None Include="assets\shaders\pixelation.fs" />
+    <None Include="assets\shaders\post\screenwave.vs" />
+    <None Include="assets\shaders\post\screenwave.fs" />
+  </ItemGroup>
 </Project>
