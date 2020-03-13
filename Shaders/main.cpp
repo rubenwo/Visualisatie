@@ -170,9 +170,9 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/toon"));
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
 
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
-	postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
 
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
@@ -220,7 +220,13 @@ void display()
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
 	
 	
+	roomShader->use();
+	roomShader->setUniform("modelMatrix", glm::scale(glm::mat4(1), distances[activeModel] * glm::vec3(1, 1, 1)));
+	roomShader->setUniform("viewMatrix", view);
+	roomShader->setUniform("projectionMatrix", projection);
+	roomShader->setUniform("s_texture", 0);
 
+	room->draw();
 
 
 	Shader* shader = shaders[currentShader];
@@ -235,15 +241,14 @@ void display()
 
 	models[activeModel]->draw();
 
-
-	cubemapShader->use();
+	/*cubemapShader->use();
 	view = glm::lookAt(glm::vec3(0, 0, distances[activeModel]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);
+	glBindVertexArray(0);*/
 
 	fbo->unbind();
 	glViewport(0, 0, screenSize.x, screenSize.y);
@@ -268,7 +273,7 @@ void display()
 
 
 
-	time += 0.001;
+	time += 0.1;
 
 	glutSwapBuffers();
 }
