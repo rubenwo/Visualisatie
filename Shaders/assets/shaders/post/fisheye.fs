@@ -1,6 +1,7 @@
-version 330
-uniform sampler2D tex0;
-varying vec4 Vertex_UV;
+#version 330
+uniform sampler2D s_texture;
+
+in vec2 texCoord;
 const float PI = 3.1415926535;
 
 void main()
@@ -10,7 +11,7 @@ void main()
   float maxFactor = sin(apertureHalf);
   
   vec2 uv;
-  vec2 xy = 2.0 * Vertex_UV.xy - 1.0;
+  vec2 xy = 2.0 * texCoord - 1.0;
   float d = length(xy);
   if (d < (2.0-maxFactor))
   {
@@ -24,8 +25,8 @@ void main()
   }
   else
   {
-    uv = Vertex_UV.xy;
+    uv = texCoord;
   }
-  vec4 c = texture2D(tex0, uv);
+  vec4 c = texture2D(s_texture, uv);
   gl_FragColor = c;
 }

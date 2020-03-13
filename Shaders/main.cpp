@@ -169,10 +169,16 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/vertexanim"));
 	shaders.push_back(new Shader("assets/shaders/toon"));
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
+	shaders.push_back(new Shader("assets/shaders/explosion"));
+	shaders.push_back(new Shader("assets/shaders/brick"));
 
-	postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
+
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/fisheye"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
+
 
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
