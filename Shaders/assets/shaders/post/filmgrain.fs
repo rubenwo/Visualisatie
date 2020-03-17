@@ -1,17 +1,27 @@
-#version 330 core
+#version 330
 
 uniform sampler2D s_texture;
-in vec2 texCoord;
+uniform float time;
 
-float random (in vec2 st) { 
-    return fract(sin(dot(st.xy,
-                         vec2(12.9898,78.233)))
-                 * 43758.5453123);
-}
+in vec2 texCoord;
 
 void main()
 {
-	//gl_FragColor = vec4(random(colorIn.xy),random(colorIn.xy),random(colorIn.xy), 1.0);
-    	gl_FragColor = texture2D(s_texture, texCoord);
+	float strength = 30.0;
 
+	float x = (texCoord.x + 4.0)*(texCoord.y *4.0)*(time*10.0);
+	
+	vec4 grain = vec4(mod((mod(x, 13.0) + 1.0) * (mod(x, 123.0) + 1.0), 0.01)-0.005) * strength;
+	
+	vec4 color = texture2D(s_texture, texCoord);
+	
+//	if (texCoord.x > 0.5)
+//	{
+//		grain = 1.0 - grain;
+//		gl_FragColor = color * grain;
+//	}
+//	else
+//	{
+		gl_FragColor = color + grain;
+//	}
 }

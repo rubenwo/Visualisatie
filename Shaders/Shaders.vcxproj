@@ -164,6 +164,10 @@
     <None Include="assets\shaders\post\bloom.vs" />
     <None Include="assets\shaders\post\filmgrain.vs" />
     <None Include="assets\shaders\post\filmgrain.fs" />
+    <None Include="assets\shaders\post\pixelation.fs" />
+    <None Include="assets\shaders\post\pixelation.vs" />
+    <None Include="assets\shaders\post\rain.fs" />
+    <None Include="assets\shaders\post\rain.vs" />
     <None Include="assets\shaders\post\screenwave.fs" />
     <None Include="assets\shaders\post\screenwave.vs" />
     <None Include="assets\shaders\reflect.fs" />

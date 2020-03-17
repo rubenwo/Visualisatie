@@ -173,12 +173,13 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/brick"));
 
 
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
-	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/fisheye"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
-
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/rain"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/pixelation"));
 
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
@@ -268,18 +269,14 @@ void display()
 	verts.push_back(glm::vec2(-1, 1));
 
 	postProcessShaders[0]->use();
-	postProcessShaders[0]->setUniform("s_texture", 0);
-	postProcessShaders[0]->setUniform("time", time);
+	glUniform1f(postProcessShaders[0]->getUniform("time"), glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
+	glUniform1i(postProcessShaders[0]->getUniform("s_texture"), 0);
+
 	fbo->use();
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, false, 2 * 4, &verts[0]);
 	glDrawArrays(GL_QUADS, 0, verts.size());
 
-
-
-
-
-	time += 0.1;
 
 	glutSwapBuffers();
 }
