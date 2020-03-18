@@ -41,11 +41,43 @@ void onDebug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei len
 {
 	std::cout << message << std::endl;
 }
+const char* result_string_pointer = "SOIL initialized";
+
+
+unsigned char* SOIL_load_image(	const char* filename,	int* width, int* height, int* channels,	int force_channels)
+{
+	unsigned char* result = stbi_load(filename,
+		width, height, channels, force_channels);
+	if (result == NULL)
+	{
+		result_string_pointer = stbi_failure_reason();
+	}
+	else
+	{
+		result_string_pointer = "Image loaded";
+	}
+	return result;
+}
+
+void SOIL_free_image_data(	unsigned char* img_data)
+{
+	if (img_data)
+		free((void*)img_data);
+}
+
+enum
+{
+	SOIL_LOAD_AUTO = 0,
+	SOIL_LOAD_L = 1,
+	SOIL_LOAD_LA = 2,
+	SOIL_LOAD_RGB = 3,
+	SOIL_LOAD_RGBA = 4
+};
 
 
 
 
-unsigned int loadCubemap(std::vector<std::string> faces)
+static GLuint LoadCubemap(std::vector<std::string > faces)
 {
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
@@ -57,14 +89,12 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 		unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 		if (data)
 		{
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
-			);
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 			stbi_image_free(data);
 		}
 		else
 		{
-			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
 			stbi_image_free(data);
 		}
 	}
@@ -77,13 +107,14 @@ unsigned int loadCubemap(std::vector<std::string> faces)
 	return textureID;
 }
 
-float skyboxVertices[] = {
-	// positions          
+
+GLfloat skyboxVertices[] = {
+	// Positions
 	-1.0f,  1.0f, -1.0f,
 	-1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f,  1.0f, -1.0f,
 	-1.0f,  1.0f, -1.0f,
 
 	-1.0f, -1.0f,  1.0f,
@@ -93,41 +124,37 @@ float skyboxVertices[] = {
 	-1.0f,  1.0f,  1.0f,
 	-1.0f, -1.0f,  1.0f,
 
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
 
 	-1.0f, -1.0f,  1.0f,
 	-1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f, -1.0f,  1.0f,
 	-1.0f, -1.0f,  1.0f,
 
 	-1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f, -1.0f,
-	 1.0f,  1.0f,  1.0f,
-	 1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f, -1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
 	-1.0f,  1.0f,  1.0f,
 	-1.0f,  1.0f, -1.0f,
 
 	-1.0f, -1.0f, -1.0f,
 	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f, -1.0f,
-	 1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
+	1.0f, -1.0f, -1.0f,
 	-1.0f, -1.0f,  1.0f,
-	 1.0f, -1.0f,  1.0f
+	1.0f, -1.0f,  1.0f
 };
-
-
-
-unsigned int cubemapTexture;
-
-Shader* cubemapShader;
 unsigned int skyboxVAO, skyboxVBO;
+Shader* skyboxShader;
+unsigned int cubemapTexture;
 
 void init()
 {
@@ -137,18 +164,13 @@ void init()
 	glClearColor(1, 0.7f, 0.3f, 1.0f);
 
 
-	std::vector<std::string> faces;
-	{
-			"assets/textures/lnegx.png",
-			"assets/textures/lnegy.png",
-			"assets/textures/lnegz.png",
-			"assets/textures/lposx.png",
-			"assets/textures/lposy.png",
-			"assets/textures/lposz.png"
-			; };
-	cubemapTexture = loadCubemap(faces);
-	cubemapShader = new Shader("assets/shaders/cubemap");
-	// skybox VAO
+
+
+	//room = new ObjModel("assets/models/room/room.obj");
+	//roomShader = new Shader("assets/shaders/texture");
+	skyboxShader = new Shader("assets/shaders/skybox");
+
+		// Setup skybox VAO
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
 	glBindVertexArray(skyboxVAO);
@@ -157,10 +179,21 @@ void init()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-	room = new ObjModel("assets/models/room/room.obj");
-	roomShader = new Shader("assets/shaders/texture");
 
+	// Cubemap (Skybox)
+	std::vector<std::string> faces;
+	faces.push_back("assets/textures/lnegx.png");
+	faces.push_back("assets/textures/lnegy.png");
+	faces.push_back("assets/textures/lnegz.png");
+	faces.push_back("assets/textures/lposx.png");
+	faces.push_back("assets/textures/lposy.png");
+	faces.push_back("assets/textures/lposz.png");
 
+	cubemapTexture = LoadCubemap(faces);
+	skyboxShader->use();
+	glUniform1i(skyboxShader->getUniform("skybox"), 0);
+
+	   
 	currentShader = 0;
 	shaders.push_back(new Shader("assets/shaders/simple"));
 	shaders.push_back(new Shader("assets/shaders/multitex"));
@@ -171,10 +204,14 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
 	shaders.push_back(new Shader("assets/shaders/explosion"));
 	shaders.push_back(new Shader("assets/shaders/brick"));
+	auto* reflect = new Shader("assets/shaders/reflect");
+	reflect->use();
+	glUniform1i(reflect->getUniform("skybox"), 0);
 
+	shaders.push_back(reflect);
 
-	postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
+	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/fisheye"));
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
@@ -227,13 +264,13 @@ void display()
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
 	
 	
-	roomShader->use();
-	roomShader->setUniform("modelMatrix", glm::scale(glm::mat4(1), distances[activeModel] * glm::vec3(1, 1, 1)));
-	roomShader->setUniform("viewMatrix", view);
-	roomShader->setUniform("projectionMatrix", projection);
-	roomShader->setUniform("s_texture", 0);
+	//roomShader->use();
+	//roomShader->setUniform("modelMatrix", glm::scale(glm::mat4(1), distances[activeModel] * glm::vec3(1, 1, 1)));
+//	roomShader->setUniform("viewMatrix", view);
+	//roomShader->setUniform("projectionMatrix", projection);
+	//roomShader->setUniform("s_texture", 0);
 
-	room->draw();
+	//room->draw();
 
 
 	Shader* shader = shaders[currentShader];
@@ -248,14 +285,29 @@ void display()
 
 	models[activeModel]->draw();
 
-	/*cubemapShader->use();
-	view = glm::lookAt(glm::vec3(0, 0, distances[activeModel]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	glm::vec3 Position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 Front = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
+	// Draw skybox as last
+	glDepthFunc(GL_LEQUAL);  // Change depth function so depth test passes when values are equal to depth buffer's content
+	skyboxShader->use();
+	// Remove any translation component of the view matrix
+	view = glm::lookAt(Position, Position + Front, Up);
 
-	glBindVertexArray(skyboxVAO);
-	glActiveTexture(GL_TEXTURE0);
+	 skyboxShader->setUniform("modelMatrix", model);
+	 skyboxShader->setUniform("viewMatrix", view);
+	 skyboxShader->setUniform("projectionMatrix", projection);
+
+
+	// skybox cube
+	 glBindVertexArray(skyboxVAO);
+	 glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	glBindVertexArray(0);*/
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS); // set depth function back to default
+
+
 
 	fbo->unbind();
 	glViewport(0, 0, screenSize.x, screenSize.y);

@@ -155,8 +155,6 @@
   <ItemGroup>
     <None Include="assets\shaders\brick.fs" />
     <None Include="assets\shaders\brick.vs" />
-    <None Include="assets\shaders\cubemap.fs" />
-    <None Include="assets\shaders\cubemap.vs" />
     <None Include="assets\shaders\explosion.gs" />
     <None Include="assets\shaders\pixelation.fs" />
     <None Include="assets\shaders\pixelation.vs" />
@@ -172,6 +170,8 @@
     <None Include="assets\shaders\post\screenwave.vs" />
     <None Include="assets\shaders\reflect.fs" />
     <None Include="assets\shaders\reflect.vs" />
+    <None Include="assets\shaders\skybox.fs" />
+    <None Include="assets\shaders\skybox.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

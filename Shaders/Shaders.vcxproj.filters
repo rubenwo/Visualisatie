@@ -48,8 +48,6 @@
   <ItemGroup>
     <None Include="assets\shaders\reflect.vs" />
     <None Include="assets\shaders\reflect.fs" />
-    <None Include="assets\shaders\cubemap.fs" />
-    <None Include="assets\shaders\cubemap.vs" />
     <None Include="assets\shaders\post\bloom.vs" />
     <None Include="assets\shaders\post\bloom.fs" />
     <None Include="assets\shaders\pixelation.vs" />
@@ -65,5 +63,7 @@
     <None Include="assets\shaders\post\rain.vs" />
     <None Include="assets\shaders\post\pixelation.vs" />
     <None Include="assets\shaders\post\pixelation.fs" />
+    <None Include="assets\shaders\skybox.vs" />
+    <None Include="assets\shaders\skybox.fs" />
   </ItemGroup>
 </Project>

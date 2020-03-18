@@ -9,13 +9,18 @@ uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat3 normalMatrix;
 
+out vec2 texCoord;
 
-out vec3 Normal;
-out vec3 Position;
+out vec3 TexCoords;
+
 
 void main()
 {
-	Normal = mat3(transpose(inverse(modelMatrix)))*a_normal;
-	Position = vec3(modelMatrix*vec4(a_position, 1.0));
-	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(a_position,1);
+    vec4 pos = projectionMatrix * viewMatrix * modelMatrix * vec4(a_position, 1.0);
+    TexCoords = vec3(modelMatrix * vec4(a_position,1.0));
+
+	texCoord = a_texcoord;
+    gl_Position = pos.xyww;
+
 }
+
