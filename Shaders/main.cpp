@@ -182,12 +182,15 @@ void init()
 
 	// Cubemap (Skybox)
 	std::vector<std::string> faces;
-	faces.push_back("assets/textures/lnegx.png");
-	faces.push_back("assets/textures/lnegy.png");
-	faces.push_back("assets/textures/lnegz.png");
-	faces.push_back("assets/textures/lposx.png");
-	faces.push_back("assets/textures/lposy.png");
-	faces.push_back("assets/textures/lposz.png");
+	faces.push_back("assets/textures/skybox/lposx.png");
+	faces.push_back("assets/textures/skybox/lnegx.png");
+
+	faces.push_back("assets/textures/skybox/lposy.png");
+	faces.push_back("assets/textures/skybox/lnegy.png");
+
+	faces.push_back("assets/textures/skybox/lposz.png");
+	faces.push_back("assets/textures/skybox/lnegz.png");
+
 
 	cubemapTexture = LoadCubemap(faces);
 	skyboxShader->use();
@@ -209,6 +212,13 @@ void init()
 	glUniform1i(reflect->getUniform("skybox"), 0);
 
 	shaders.push_back(reflect);
+
+	auto* refract = new Shader("assets/shaders/refract");
+	refract->use();
+	glUniform1i(refract->getUniform("skybox"), 0);
+
+	shaders.push_back(refract);
+
 
 	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
 	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));

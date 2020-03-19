@@ -65,5 +65,7 @@
     <None Include="assets\shaders\post\pixelation.fs" />
     <None Include="assets\shaders\skybox.vs" />
     <None Include="assets\shaders\skybox.fs" />
+    <None Include="assets\shaders\refract.vs" />
+    <None Include="assets\shaders\refract.fs" />
   </ItemGroup>
 </Project>
