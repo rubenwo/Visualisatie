@@ -54,11 +54,8 @@
     <None Include="assets\shaders\pixelation.fs" />
     <None Include="assets\shaders\post\screenwave.vs" />
     <None Include="assets\shaders\post\screenwave.fs" />
-    <None Include="assets\shaders\brick.vs" />
-    <None Include="assets\shaders\brick.fs" />
     <None Include="assets\shaders\post\filmgrain.vs" />
     <None Include="assets\shaders\post\filmgrain.fs" />
-    <None Include="assets\shaders\explosion.gs" />
     <None Include="assets\shaders\post\rain.fs" />
     <None Include="assets\shaders\post\rain.vs" />
     <None Include="assets\shaders\post\pixelation.vs" />

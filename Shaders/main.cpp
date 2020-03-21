@@ -27,6 +27,7 @@ Fbo* fbo;
 int activeModel = 0;
 
 int currentShader;
+int currentPPShader;
 
 glm::ivec2 screenSize;
 float rotation;
@@ -205,8 +206,6 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/vertexanim"));
 	shaders.push_back(new Shader("assets/shaders/toon"));
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
-	shaders.push_back(new Shader("assets/shaders/explosion"));
-	shaders.push_back(new Shader("assets/shaders/brick"));
 	auto* reflect = new Shader("assets/shaders/reflect");
 	reflect->use();
 	glUniform1i(reflect->getUniform("skybox"), 0);
@@ -219,14 +218,13 @@ void init()
 
 	shaders.push_back(refract);
 
-
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
 	postProcessShaders.push_back(new Shader("assets/shaders/post/postprocess"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/fisheye"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/rain"));
-	//postProcessShaders.push_back(new Shader("assets/shaders/post/pixelation"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/bloom"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/screenwave"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/fisheye"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/rain"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/pixelation"));
 
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
@@ -270,7 +268,7 @@ void display()
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, distances[activeModel]), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
 	glm::mat4 model = glm::translate(glm::mat4(1), glm::vec3(0, 0, -1));
 	model = glm::rotate(model, rotation, glm::vec3(0, 1, 0));
-
+	
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(view * model)));
 	
 	
@@ -303,8 +301,9 @@ void display()
 	skyboxShader->use();
 	// Remove any translation component of the view matrix
 	view = glm::lookAt(Position, Position + Front, Up);
-
-	 skyboxShader->setUniform("modelMatrix", model);
+	//view = glm::rotate(view, -rotation, glm::vec3(1, 1, 1));
+	 
+	skyboxShader->setUniform("modelMatrix", model);
 	 skyboxShader->setUniform("viewMatrix", view);
 	 skyboxShader->setUniform("projectionMatrix", projection);
 
@@ -330,9 +329,9 @@ void display()
 	verts.push_back(glm::vec2(1, 1));
 	verts.push_back(glm::vec2(-1, 1));
 
-	postProcessShaders[0]->use();
-	glUniform1f(postProcessShaders[0]->getUniform("time"), glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
-	glUniform1i(postProcessShaders[0]->getUniform("s_texture"), 0);
+	postProcessShaders[currentPPShader]->use();
+	glUniform1f(postProcessShaders[currentPPShader]->getUniform("time"), glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
+	glUniform1i(postProcessShaders[currentPPShader]->getUniform("s_texture"), 0);
 
 	fbo->use();
 	glEnableVertexAttribArray(0);
@@ -354,6 +353,14 @@ void keyboard(unsigned char key, int x, int y)
 {
 	if (key == VK_ESCAPE)
 		glutLeaveMainLoop();
+	if (key == 'k') {
+		currentPPShader = (currentPPShader + postProcessShaders.size() - 1) % postProcessShaders.size();
+		std::cout << "Shader " << currentPPShader << std::endl;
+	}
+	if (key == 'l') {
+		currentPPShader = (currentPPShader + 1) % postProcessShaders.size();
+		std::cout << "Shader " << currentShader << std::endl;
+	}
 	if (key == '[')
 	{
 		currentShader = (currentShader + shaders.size() - 1) % shaders.size();
