@@ -64,5 +64,7 @@
     <None Include="assets\shaders\skybox.fs" />
     <None Include="assets\shaders\refract.vs" />
     <None Include="assets\shaders\refract.fs" />
+    <None Include="assets\shaders\cardboard.vs" />
+    <None Include="assets\shaders\cardboard.fs" />
   </ItemGroup>
 </Project>

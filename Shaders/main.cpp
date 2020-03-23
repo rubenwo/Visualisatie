@@ -173,6 +173,8 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/vertexanim"));
 	shaders.push_back(new Shader("assets/shaders/toon"));
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
+	shaders.push_back(new Shader("assets/shaders/cardboard"));
+
 	auto* reflect = new Shader("assets/shaders/reflect");
 	reflect->use();
 	glUniform1i(reflect->getUniform("skybox"), 0);
