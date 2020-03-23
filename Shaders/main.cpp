@@ -153,6 +153,7 @@ GLfloat skyboxVertices[] = {
 	-1.0f, -1.0f,  1.0f,
 	1.0f, -1.0f,  1.0f
 };
+
 unsigned int skyboxVAO, skyboxVBO;
 Shader* skyboxShader;
 unsigned int cubemapTexture;
@@ -226,15 +227,19 @@ void init()
 	postProcessShaders.push_back(new Shader("assets/shaders/post/rain"));
 	postProcessShaders.push_back(new Shader("assets/shaders/post/pixelation"));
 
+	models.push_back(new ObjModel("assets/models/cube/cube-textures.obj"));
+	distances.push_back(2);
 	models.push_back(new ObjModel("assets/models/ship/shipA_OBJ.obj"));
 	distances.push_back(50);
 	models.push_back(new ObjModel("assets/models/car/honda_jazz.obj"));
 	distances.push_back(150);
-	//	model = new ObjModel("assets/models/bloemetje/PrimroseP.obj");
 	models.push_back(new ObjModel("assets/models/normalstuff/normaltest.obj"));
 	distances.push_back(2);
 	models.push_back(new ObjModel("assets/models/normalstuff/normaltest2.obj"));
 	distances.push_back(2);
+	models.push_back(new ObjModel("assets/models/bloemetje/PrimroseP.obj"));
+	distances.push_back(2);
+
 
 	if (glDebugMessageCallback)
 	{
@@ -301,7 +306,7 @@ void display()
 	skyboxShader->use();
 	// Remove any translation component of the view matrix
 	view = glm::lookAt(Position, Position + Front, Up);
-	//view = glm::rotate(view, -rotation, glm::vec3(1, 1, 1));
+	view = glm::rotate(view, -rotation, glm::vec3(1, 1, 1));
 	 
 	skyboxShader->setUniform("modelMatrix", model);
 	 skyboxShader->setUniform("viewMatrix", view);
