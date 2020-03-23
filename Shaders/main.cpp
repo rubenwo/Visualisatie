@@ -42,40 +42,6 @@ void onDebug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei len
 {
 	std::cout << message << std::endl;
 }
-const char* result_string_pointer = "SOIL initialized";
-
-
-unsigned char* SOIL_load_image(	const char* filename,	int* width, int* height, int* channels,	int force_channels)
-{
-	unsigned char* result = stbi_load(filename,
-		width, height, channels, force_channels);
-	if (result == NULL)
-	{
-		result_string_pointer = stbi_failure_reason();
-	}
-	else
-	{
-		result_string_pointer = "Image loaded";
-	}
-	return result;
-}
-
-void SOIL_free_image_data(	unsigned char* img_data)
-{
-	if (img_data)
-		free((void*)img_data);
-}
-
-enum
-{
-	SOIL_LOAD_AUTO = 0,
-	SOIL_LOAD_L = 1,
-	SOIL_LOAD_LA = 2,
-	SOIL_LOAD_RGB = 3,
-	SOIL_LOAD_RGBA = 4
-};
-
-
 
 
 static GLuint LoadCubemap(std::vector<std::string > faces)
