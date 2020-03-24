@@ -66,5 +66,9 @@
     <None Include="assets\shaders\refract.fs" />
     <None Include="assets\shaders\cardboard.vs" />
     <None Include="assets\shaders\cardboard.fs" />
+    <None Include="assets\shaders\post\blur.fs" />
+    <None Include="assets\shaders\post\blur.vs" />
+    <None Include="assets\shaders\lava.fs" />
+    <None Include="assets\shaders\lava.vs" />
   </ItemGroup>
 </Project>

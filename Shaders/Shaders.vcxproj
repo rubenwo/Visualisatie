@@ -155,10 +155,14 @@
   <ItemGroup>
     <None Include="assets\shaders\cardboard.fs" />
     <None Include="assets\shaders\cardboard.vs" />
+    <None Include="assets\shaders\lava.fs" />
+    <None Include="assets\shaders\lava.vs" />
     <None Include="assets\shaders\pixelation.fs" />
     <None Include="assets\shaders\pixelation.vs" />
     <None Include="assets\shaders\post\bloom.fs" />
     <None Include="assets\shaders\post\bloom.vs" />
+    <None Include="assets\shaders\post\blur.fs" />
+    <None Include="assets\shaders\post\blur.vs" />
     <None Include="assets\shaders\post\filmgrain.vs" />
     <None Include="assets\shaders\post\filmgrain.fs" />
     <None Include="assets\shaders\post\pixelation.fs" />

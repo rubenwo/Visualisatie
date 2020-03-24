@@ -1,12 +1,11 @@
 #version 330
 uniform sampler2D s_texture;
 uniform float time;
-
+uniform vec2 resolution;
 in vec2 texCoord;
 
 void main()
 {  
-    vec2 resolution = vec2(1920,1080);
 
 	vec2 uv = texCoord;
     vec4 tex = texture2D(s_texture, uv);

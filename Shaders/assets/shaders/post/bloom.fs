@@ -1,35 +1,34 @@
 #version 330
 uniform sampler2D s_texture;
+uniform vec2 resolution;
+
 in vec2 texCoord;
 
-in vec3 normal; 
-in vec3 color;
+vec4 bloomEffect(in vec2 coords) {
+   
 
-void main()
-{
-    float o = 24/2048.0;
+  vec4 bloom = vec4(0.0);
+  int j;
+  int i;
+  float bloomLevel = 20;
 
-	vec4 color;
-	
-	if (color.x > 0.4 || color.y > 0.4 || color.z > 0.4){
+  for( i = -4 ; i < 4; i++) {
+    for (j = -3; j < 3; j++) {
+      bloom += texture2D(s_texture, coords + vec2((j * 1.0 / resolution.x), (i * 1.0 / resolution.y))) * (bloomLevel * 0.01);
+    }
+  }
+    
+  if (texture2D(s_texture, coords).r < 0.3) {
+    bloom = bloom * bloom * 0.012;
+  } else if (texture2D(s_texture, coords).r < 0.5) {
+    bloom = bloom * bloom * 0.009;
+  } else {
+    bloom = bloom * bloom *0.0075;
+  }
+  
+  return bloom + texture2D(s_texture, coords);
+}
 
-
-	} else {
-		//color = texture2D(s_texture, texCoord);
-	}
-
-	color = (texture2D(s_texture, texCoord) +
-        texture2D(s_texture, texCoord + vec2(-o, -o)) +
-        texture2D(s_texture, texCoord + vec2(-o, o)) +
-        texture2D(s_texture, texCoord + vec2(o, o)) +
-        texture2D(s_texture, texCoord + vec2(o, -o))) / 5.0;
-	
-	if (color.x > 0.4)
-		color.x += color.x * 0.5;
-	if (color.y > 0.4)
-		color.y += color.y * 0.5;
-	if (color.z > 0.4)
-		color.z += color.z * 0.5;
-
-	gl_FragColor = color;
+void main(){
+  gl_FragColor = bloomEffect(texCoord);
 }

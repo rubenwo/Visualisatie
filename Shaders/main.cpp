@@ -174,6 +174,7 @@ void init()
 	shaders.push_back(new Shader("assets/shaders/toon"));
 	shaders.push_back(new Shader("assets/shaders/pixelation"));
 	shaders.push_back(new Shader("assets/shaders/cardboard"));
+	shaders.push_back(new Shader("assets/shaders/lava"));
 
 	auto* reflect = new Shader("assets/shaders/reflect");
 	reflect->use();
@@ -194,6 +195,7 @@ void init()
 	postProcessShaders.push_back(new Shader("assets/shaders/post/filmgrain"));
 	postProcessShaders.push_back(new Shader("assets/shaders/post/rain"));
 	postProcessShaders.push_back(new Shader("assets/shaders/post/pixelation"));
+	postProcessShaders.push_back(new Shader("assets/shaders/post/blur"));
 
 	models.push_back(new ObjModel("assets/models/cube/cube-textures.obj"));
 	distances.push_back(2);
@@ -263,6 +265,7 @@ void display()
 	glUniformMatrix3fv(shader->getUniform("normalMatrix"), 1, 0, glm::value_ptr(normalMatrix));								//en zet de matrix in opengl
 	glUniform1f(shader->getUniform("time"), glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
 	glUniform1i(shader->getUniform("s_texture"), 0);
+	glUniform2f(shader->getUniform("resolution"), screenSize.x, screenSize.y);
 
 	models[activeModel]->draw();
 
@@ -274,7 +277,7 @@ void display()
 	skyboxShader->use();
 	// Remove any translation component of the view matrix
 	view = glm::lookAt(Position, Position + Front, Up);
-	view = glm::rotate(view, -rotation, glm::vec3(1, 1, 1));
+	//view = glm::rotate(view, -rotation, glm::vec3(1, 1, 1));
 	 
 	skyboxShader->setUniform("modelMatrix", model);
 	 skyboxShader->setUniform("viewMatrix", view);
@@ -305,6 +308,7 @@ void display()
 	postProcessShaders[currentPPShader]->use();
 	glUniform1f(postProcessShaders[currentPPShader]->getUniform("time"), glutGet(GLUT_ELAPSED_TIME) / 1000.0f);
 	glUniform1i(postProcessShaders[currentPPShader]->getUniform("s_texture"), 0);
+	glUniform2f(postProcessShaders[currentPPShader]->getUniform("resolution"), screenSize.x, screenSize.y);
 
 	fbo->use();
 	glEnableVertexAttribArray(0);
@@ -344,8 +348,11 @@ void keyboard(unsigned char key, int x, int y)
 		currentShader = (currentShader + 1) % shaders.size();
 		std::cout << "Shader " << currentShader << std::endl;
 	}
-	if (key == ',' || key == '.')
+	if (key == '.')
 		activeModel = (activeModel + 1) % models.size();
+	if(key == ',')
+		activeModel = (activeModel + models.size() - 1) % models.size();
+
 }
 
 void update()
